@@ -18,16 +18,16 @@ class Dialog : public QDialog
 public:
     Dialog(QWidget *parent = nullptr);
     ~Dialog();
-    void slt(QPixmap img);
     //static int hor,ver,phor,pver;
     void horchanging();
     void verchanging();
     void thumbchanging();
-    void buzhidaojiaoshenme(QImage timg);
+    void buzhidaojiaoshenme();
     void correction(int id,int x,int y);
     void winning();
     void timerEvent(QTimerEvent *event);
     void paintEvent(QPaintEvent *event);
+    void readImage();
     int tim;QTime seconds;
     bool won = 0;
 private:
