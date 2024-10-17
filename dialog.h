@@ -28,6 +28,8 @@ public:
     void timerEvent(QTimerEvent *event);
     void paintEvent(QPaintEvent *event);
     void readImage();
+    void playMusic();
+    void musicOptions();
     int tim;QTime seconds;
     bool won = 0;
 private:

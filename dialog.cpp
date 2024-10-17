@@ -11,6 +11,9 @@
 #include "random"
 #include "QTimer"
 #include "QPainter"
+#include "QtMultimedia"
+#include "QtMultimediaWidgets"
+#include "QUrl"
 
 QPixmap * qwq = nullptr;
 QImage latest_img;
@@ -93,6 +96,7 @@ void Dialog::buzhidaojiaoshenme(){
     ui->label_2->hide();
     ui->label_3->hide();
     ui->checkBox->hide();
+    ui->checkBox_2->hide();
     qDebug()<<timg.width()<<" "<<timg.height();
     //while(timg.height() > 800) timg = timg.scaled((QSize){timg.width()/2,timg.height()/2});
     double rt1 = (double)timg.height() / HMax, rt2 = (double)timg.width() / WMax;int tmp1 = 0, tmp2 = 0;
@@ -159,11 +163,16 @@ void Dialog::buzhidaojiaoshenme(){
     showt->show();
 }
 bool FirstConnected = true;
+QMediaPlayer *player;
+QAudioOutput *audio;
 void Dialog::readImage(){
     QString curpath = QDir::currentPath();
     QString fname = QFileDialog::getOpenFileName(this,"选择一张图片...",curpath,"图片文件(*.jpg *.gif *.png)");
     QFile file(fname);
     QPixmap img(fname);
+    qDebug()<<player->source();
+    qDebug()<<player->hasAudio();
+    qDebug()<<player->duration();
 
     if(img.height() == 0) {
         QMessageBox::information(this, "提示", "图片读取失败！");
@@ -188,6 +197,28 @@ void Dialog::readImage(){
     connect(ui->btn,&QPushButton::clicked,this,&Dialog::buzhidaojiaoshenme);
 }
 
+void Dialog::playMusic(){
+    //QString curpath = QDir::currentPath();
+    audio =  new QAudioOutput(this);
+    player = new QMediaPlayer(this);
+    player->setAudioOutput(audio);
+    player->setSource(QUrl("qrc:/bgm/bgm.mp3"));
+    player->setLoops(10);
+    audio->setVolume(0.25);
+    player->play();
+    qDebug()<<player->source();
+    qDebug()<<player->hasAudio();
+    qDebug()<<player->duration();
+}
+void Dialog::musicOptions(){
+    bool state = ui->checkBox_2->isChecked();
+    if(state == false) {
+        player->pause();
+    }
+    else {
+        player->play();
+    }
+}
 Dialog::Dialog(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::Dialog)
@@ -199,23 +230,25 @@ Dialog::Dialog(QWidget *parent)
     connect(ui->btn_2,&QPushButton::clicked,this,&Dialog::readImage);
     showt = new QLabel;
 
-    //read the image
     in_window = true;
     repaint();
     this->resize(800,600);
     this->setWindowTitle("Beacon's Puzzle");
     this->setPalette(QPalette(Qt::white));
+    playMusic();
 
     //qDebug()<<(img.height());
     //qDebug()<<(img.width());//成功读取图片
     //connect(ui->btn,&QPushButton::clicked,this,[img,this](){slt(img);});
     QString styleSheet = "QCheckBox{ spacing:5px; }";
     ui->checkBox->setStyleSheet(styleSheet);
+    ui->checkBox_2->setStyleSheet(styleSheet);
 
 
     connect(ui->checkBox,&QCheckBox::stateChanged,this,&Dialog::thumbchanging);
     connect(ui->spinBox_1,&QSpinBox::valueChanged,this,&Dialog::horchanging);
     connect(ui->spinBox_2,&QSpinBox::valueChanged,this,&Dialog::verchanging);
+    connect(ui->checkBox_2,&QCheckBox::stateChanged,this,&Dialog::musicOptions);
 }
 
 Dialog::~Dialog()
